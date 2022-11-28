@@ -1,11 +1,13 @@
 ﻿using System.Threading.Tasks;
 using ConfArch.Data.Models;
 using ConfArch.Data.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ConfArch.Web.Controllers
 {
-    public class ProposalController: Controller
+    [Authorize]
+    public class ProposalController : Controller
     {
         private readonly IConferenceRepository conferenceRepo;
         private readonly IProposalRepository proposalRepo;
@@ -18,7 +20,7 @@ namespace ConfArch.Web.Controllers
 
         public async Task<IActionResult> Index(int conferenceId)
         {
-            var conference = await conferenceRepo.GetById(conferenceId);      
+            var conference = await conferenceRepo.GetById(conferenceId);
             ViewBag.Title = $"Speaker - Proposals For Conference {conference.Name} {conference.Location}";
             ViewBag.ConferenceId = conferenceId;
 
@@ -28,7 +30,7 @@ namespace ConfArch.Web.Controllers
         public IActionResult AddProposal(int conferenceId)
         {
             ViewBag.Title = "Speaker - Add Proposal";
-            return View(new ProposalModel {ConferenceId = conferenceId});
+            return View(new ProposalModel { ConferenceId = conferenceId });
         }
 
         [HttpPost]
@@ -36,7 +38,7 @@ namespace ConfArch.Web.Controllers
         {
             if (ModelState.IsValid)
                 await proposalRepo.Add(proposal);
-            return RedirectToAction("Index", new {conferenceId = proposal.ConferenceId});
+            return RedirectToAction("Index", new { conferenceId = proposal.ConferenceId });
         }
 
         public async Task<IActionResult> Approve(int proposalId)
